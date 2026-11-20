@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de pedidos de material</title>
+  <link rel="stylesheet" href="public/css/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Gestor de pedidos de material</h1>
+  </header>
+
+  <main>
+    <!-- 1. CATÁLOGO DE PRODUCTOS -->
+    <section id="seccion-catalogo">
+      <h2>Catálogo de productos</h2>
+
+      <p>
+        <label for="busqueda">Buscar por nombre</label>
+        <input id="busqueda" name="busqueda" type="search">
+      </p>
+
+      <p>
+        <label for="filtro-categoria">Filtrar por categoría</label>
+        <select id="filtro-categoria" name="categoria">
+          <option value="" selected hidden></option>
+          <option value="todas">Todas</option>
+        </select>
+      </p>
+
+      <p id="mensaje-catalogo" role="status"></p>
+      <section id="lista-catalogo" aria-label="Productos disponibles"></section>
+    </section>
+
+    <!-- 2. CARRITO ACTIVO -->
+    <section id="seccion-carrito">
+      <h2>Carrito</h2>
+
+      <p id="mensaje-carrito" role="status">El carrito está vacío.</p>
+      <ul id="lista-carrito"></ul>
+
+      <p>Total de unidades: <output id="total-unidades">0</output></p>
+      <p>Subtotal: <output id="subtotal-carrito">0.00</output> €</p>
+      <p>Descuento (10 % a partir de 100 €): <output id="descuento-carrito">0.00</output> €</p>
+      <p><strong>Total: <output id="total-carrito">0.00</output> €</strong></p>
+    </section>
+
+    <!-- 3. FORMULARIO Y CONFIRMACIÓN DE PEDIDO -->
+    <section id="seccion-pedido">
+      <h2>Datos del pedido</h2>
+
+      <form id="form-pedido" novalidate>
+        <p>
+          <label for="nombre">Nombre y apellidos</label>
+          <input id="nombre" name="nombre" type="text" required minlength="2" maxlength="60" aria-describedby="e-nombre">
+          <small id="e-nombre" class="error" aria-live="polite"></small>
+        </p>
+
+        <p>
+          <label for="email">Correo electrónico</label>
+          <input id="email" name="email" type="email" required aria-describedby="e-email">
+          <small id="e-email" class="error" aria-live="polite"></small>
+        </p>
+
+        <fieldset>
+          <legend>Modalidad de entrega</legend>
+          <label>
+            <input type="radio" name="entrega" value="recogida" checked aria-describedby="e-entrega">
+            Recogida en tienda
+          </label>
+          <label>
+            <input type="radio" name="entrega" value="envio" aria-describedby="e-entrega">
+            Envío a domicilio
+          </label>
+          <small id="e-entrega" class="error" aria-live="polite"></small>
+        </fieldset>
+
+        <fieldset id="bloque-envio" hidden>
+          <legend>Datos postales de envío</legend>
+          <p>
+            <label for="direccion">Dirección</label>
+            <input id="direccion" name="direccion" type="text" minlength="5" maxlength="100" aria-describedby="e-direccion">
+            <small id="e-direccion" class="error" aria-live="polite"></small>
+          </p>
+
+          <p>
+            <label for="cp">Código postal</label>
+            <input id="cp" name="cp" type="text" maxlength="5" inputmode="numeric" aria-describedby="e-cp">
+            <small id="e-cp" class="error" aria-live="polite"></small>
+          </p>
+        </fieldset>
+
+        <p>
+          <label for="observaciones">Observaciones (opcional)</label>
+          <textarea id="observaciones" name="observaciones" maxlength="200" aria-describedby="contador-obs e-observaciones"></textarea>
+          <small id="contador-obs">0 / 200 caracteres</small>
+          <small id="e-observaciones" class="error" aria-live="polite"></small>
+        </p>
+
+        <p>
+          <label>
+            <input id="acepto" name="acepto" type="checkbox" required aria-describedby="e-acepto">
+            Confirmo que los datos del pedido son correctos
+          </label>
+          <small id="e-acepto" class="error" aria-live="polite"></small>
+        </p>
+
+        <button type="submit">Confirmar pedido</button>
+      </form>
+
+      <p id="estado-pedido" role="status"></p>
+    </section>
+
+    <!-- 4. HISTORIAL Y EXPORTACIÓN JSON -->
+    <section id="seccion-historial">
+      <h2>Historial de pedidos</h2>
+
+      <p>
+        <label for="filtro-historial">Filtrar por modalidad</label>
+        <select id="filtro-historial" name="filtroHistorial">
+          <option value="" selected hidden></option>
+          <option value="todos">Todos</option>
+          <option value="recogida">Recogida</option>
+          <option value="envio">Envío</option>
+        </select>
+      </p>
+
+      <p>
+        Pedidos mostrados: <output id="historial-cantidad">0</output> |
+        Suma de importes: <output id="historial-total">0.00</output> €
+      </p>
+
+      <p id="mensaje-historial" role="status">No hay pedidos confirmados.</p>
+      <section id="lista-historial" aria-label="Pedidos confirmados"></section>
+
+      <p>
+        <button type="button" id="btn-exportar">Exportar historial</button>
+      </p>
+
+      <p>
+        <label for="json-historial">Historial en JSON</label>
+        <textarea id="json-historial" rows="8" readonly></textarea>
+      </p>
+    </section>
+  </main>
+</body>
+</html>

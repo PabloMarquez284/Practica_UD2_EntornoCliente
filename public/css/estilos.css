@@ -1,0 +1,152 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: #f5f7fa;
+  color: #1f2937;
+}
+
+header h1 {
+  margin-bottom: 1.5rem;
+}
+
+/* Bloques principales */
+main > section {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.4rem;
+}
+
+/* Rejilla sencilla para las tarjetas de producto */
+#lista-catalogo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Tarjetas de catálogo e historial (se crearán como <article> desde JS) */
+article {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.9rem;
+  background-color: #fafafa;
+}
+
+#lista-historial article {
+  margin-bottom: 0.75rem;
+}
+
+/* Carrito */
+#lista-carrito {
+  list-style: none;
+  padding: 0;
+}
+
+#lista-carrito li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Formularios y controles */
+label {
+  display: block;
+  margin-top: 0.6rem;
+  font-weight: 600;
+}
+
+/* En radios y checkboxes el texto va junto al control */
+fieldset label,
+label:has(input[type="checkbox"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 1rem;
+  font-weight: normal;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  max-width: 420px;
+  padding: 0.45rem 0.6rem;
+  margin-top: 0.25rem;
+  border: 1px solid #9ca3af;
+  border-radius: 4px;
+  font: inherit;
+}
+
+/* Inputs de cantidad dentro de cada tarjeta de producto */
+article input[type="number"] {
+  width: 75px;
+  margin-right: 0.5rem;
+}
+
+fieldset {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  max-width: 420px;
+}
+
+button {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid #1d4ed8;
+  border-radius: 4px;
+  background-color: #2563eb;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+
+button:disabled {
+  background-color: #9ca3af;
+  border-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Validación y estados (según Sesión 13) */
+.error {
+  display: block;
+  color: #9b1c1c;
+  min-height: 1.2em;
+}
+
+[aria-invalid="true"] {
+  border: 2px solid #9b1c1c;
+}
+
+[role="status"] {
+  font-weight: 600;
+}
+
+[hidden] {
+  display: none;
+}
