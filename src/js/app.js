@@ -134,6 +134,225 @@ listaCarrito.addEventListener("click", (e) => {
     }
 });
 
+// Referencias al formulario y sus controles
+const formPedido = document.querySelector("#form-pedido");
+const bloqueEnvio = document.querySelector("#bloque-envio");
+const contadorObs = document.querySelector("#contador-obs");
+const estadoPedido = document.querySelector("#estado-pedido");
+
+const campoNombre = formPedido.elements.namedItem("nombre");
+const campoEmail = formPedido.elements.namedItem("email");
+const campoDireccion = formPedido.elements.namedItem("direccion");
+const campoCP = formPedido.elements.namedItem("cp");
+const campoObs = formPedido.elements.namedItem("observaciones");
+const campoAcepto = formPedido.elements.namedItem("acepto");
+const radioEntrega = document.querySelector('input[name="entrega"]');
+
+// Lista de campos editados (para no mostrar errores antes de tocar un campo)
+const visitados = new Set();
+const camposValidables = [campoNombre, campoEmail, radioEntrega, campoDireccion, campoCP, campoObs, campoAcepto];
+
+// Función para alternar entre las opciones (recogida y envio)
+function actualizarModalidad() {
+    const modalidad = formPedido.elements.entrega.value;
+
+    if (modalidad === "envio") {
+        bloqueEnvio.hidden = false;
+        campoDireccion.required = true;
+        campoCP.required = true;
+    } else {
+        bloqueEnvio.hidden = true;
+        campoDireccion.required = false;
+        campoCP.required = false;
+        
+        // Limpiar errores previos si el usuario vuelve a recogida
+        campoDireccion.setCustomValidity("");
+        campoCP.setCustomValidity("");
+        document.querySelector("#e-direccion").textContent = "";
+        document.querySelector("#e-cp").textContent = "";
+        campoDireccion.removeAttribute("aria-invalid");
+        campoCP.removeAttribute("aria-invalid");
+    }
+}
+
+// Función para validar el formulario
+function validarFormulario() {
+    // Limpiar errores personalizados anteriores de todos los campos
+    camposValidables.forEach((campo) => {
+        campo.setCustomValidity("");
+    });
+
+    // Recoger los datos actuales con FormData
+    const formData = new FormData(formPedido);
+    const datos = {
+        nombre: formData.get("nombre"),
+        email: formData.get("email"),
+        entrega: formData.get("entrega"),
+        direccion: formData.get("direccion"),
+        cp: formData.get("cp"),
+        observaciones: formData.get("observaciones"),
+        acepto: campoAcepto.checked
+    };
+
+    // Validar con la función pura y asignar cada error a su control
+    const errores = validarDatosPedido(datos);
+
+    campoNombre.setCustomValidity(errores.nombre);
+    campoEmail.setCustomValidity(errores.email);
+    radioEntrega.setCustomValidity(errores.entrega);
+    campoDireccion.setCustomValidity(errores.direccion);
+    campoCP.setCustomValidity(errores.cp);
+    campoObs.setCustomValidity(errores.observaciones);
+    campoAcepto.setCustomValidity(errores.acepto);
+
+    // Devolver si todo el formulario es válido
+    return formPedido.checkValidity();
+}
+
+// Parejas de [control, etiqueta <small> donde pintar su error]
+const paresError = [
+    [campoNombre, document.querySelector("#e-nombre")],
+    [campoEmail, document.querySelector("#e-email")],
+    [radioEntrega, document.querySelector("#e-entrega")],
+    [campoDireccion, document.querySelector("#e-direccion")],
+    [campoCP, document.querySelector("#e-cp")],
+    [campoObs, document.querySelector("#e-observaciones")],
+    [campoAcepto, document.querySelector("#e-acepto")]
+];
+
+// Función para mostrar los errores que se produzcan
+function mostrarErrores(todos = false) {
+    const esRecogida = formPedido.elements.entrega.value === "recogida";
+
+    paresError.forEach(([campo, etiquetaError]) => {
+        // Si es recogida, no mostramos errores de dirección ni código postal
+        if (esRecogida && (campo === campoDireccion || campo === campoCp)) {
+            return;
+        }
+        // Si no se piden todos, solo mostramos los campos que el usuario ya tocó
+        if (!todos && !visitados.has(campo)) {
+            return;
+        }
+        etiquetaError.textContent = campo.validationMessage;
+        campo.setAttribute("aria-invalid", String(!campo.validity.valid));
+    });
+}
+
+// Contador de caracteres en vivo para observaciones
+campoObs.addEventListener("input", () => {
+    contadorObs.textContent = `${campoObs.value.length} / 200 caracteres`;
+});
+
+// Validación en vivo mientras el usuario edita
+function revisarEdicion(e) {
+    if (e.target.name === "entrega") {
+        actualizarModalidad();
+    }
+    const control = e.target.name === "entrega" ? radioEntrega : e.target;
+    visitados.add(control);
+    estadoPedido.textContent = "";
+    validarFormulario();
+    mostrarErrores();
+}
+
+formPedido.addEventListener("input", revisarEdicion);
+formPedido.addEventListener("change", revisarEdicion);
+
+// Envío del formulario
+formPedido.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const esValido = validarFormulario();
+    mostrarErrores(true);
+
+    if (!esValido) {
+        estadoPedido.textContent = "Revisa los campos marcados antes de confirmar.";
+        formPedido.reportValidity();
+        const primerInvalido = camposValidables.find((c) => !c.validity.valid);
+        if (primerInvalido) {
+            primerInvalido.focus();
+        }
+        return;
+    }
+
+    // Comprobar carrito/stock y guardar el pedido
+    estadoPedido.textContent = "Datos del formulario válidos (pendiente de procesar pedido).";
+
+    // Comprobar que el carrito no esté vacío
+    if (carrito.length === 0) {
+       estadoPedido.textContent = "Añade al menos un producto al carrito antes de confirmar."; 
+       return;
+    }
+
+    // Verificar el stock de todas las líneas ANTES de modificar nada
+    for (const linea of carrito) {
+        const producto = catalogo.find((p) => p.id === linea.productoId);
+        if (!producto || !producto.hayStock(linea.cantidad)) {
+            const nombreProd = producto ? producto.nombre : "el producto seleccionado";
+            estadoPedido.textContent = `No hay stock suficiente para ${nombreProd}.`;
+            return;
+        }
+    }
+
+    // Descontar el stock y construir el array de líneas compradas
+    const lineasCompradas = [];
+    carrito.forEach((linea) => {
+        const producto = catalogo.find((p) => p.id === linea.productoId);
+        producto.descontarStock(linea.cantidad);
+
+        lineasCompradas.push({
+            productoId: producto.id,
+            nombre: producto.nombre,
+            precioUnitario: producto.precio,
+            cantidad: linea.cantidad,
+            subtotal: producto.precio * linea.cantidad
+        });
+    });
+
+    // Recoger los datos validados y guardar el pedido en el array pedidos
+    const formData = new FormData(formPedido);
+    const modalidad = formData.get("entrega");
+    const datosCliente = {
+        nombre: (formData.get("nombre") || "").trim(),
+        email: (formData.get("email") || "").trim(),
+        entrega: modalidad,
+        direccion: modalidad === "envio" ? (formData.get("direccion") || "").trim() : "",
+        cp: modalidad === "envio" ? (formData.get("cp") || "").trim() : "",
+        observaciones: (formData.get("observaciones") || "").trim(),
+        acepto: campoAcepto.checked
+    };
+
+    const subtotal = calcularSubtotal(carrito, catalogo);
+    const descuento = calcularDescuento(subtotal, 10);
+    const total = subtotal - descuento;
+
+    const nuevoPedido = {
+        id: pedidos.length + 1,
+        fecha: new Date().toLocaleString("es-ES"),
+        cliente: datosCliente,
+        lineas: lineasCompradas,
+        subtotal,
+        descuento,
+        total
+    };
+
+    pedidos.push(nuevoPedido);
+
+    // Reiniciar estado e interfaz del formulario
+    carrito.length = 0;
+
+    formPedido.reset();
+    visitados.clear();
+    actualizarModalidad();
+    contadorObs.textContent = "0 / 200 caracteres";
+    camposValidables.forEach((campo) => campo.removeAttribute("aria-invalid"));
+
+    renderizarCatalogo();
+    renderizarCarrito();
+
+    estadoPedido.textContent = `¡Pedido #${nuevoPedido.id} registrado correctamente!`;
+});
+
 // Pintado inicial
 renderizarCatalogo();
 renderizarCarrito();
