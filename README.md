@@ -2,6 +2,8 @@
 ## Tienda Online Modular — Gestión de Catálogo, Carrito y Pedidos
 Este trabajo trata de desarrollar una aplicación web para consultar un catálogo de material informático o de oficina, gestionar un carrito y confirmar pedidos. Toda la lógica se ejecutará en el navegador mediante HTML, CSS y JavaScript. Se trabajará con funciones, arrays, objetos, eventos, formularios y validación de datos.
 
+Esta práctica la he realizado junto con el apoyo de la IA, guiándome paso a paso y ayudándome en los errores que he tenido. Dejo por aquí el enlace al chat con Gemini: https://gemini.google.com/share/d/1lYtPoRnDOwnoud5C7kKp9pjVoGLLXdJq?usp=sharing
+
 ## 1. Estructura y explicación de los archivos
 
 El proyecto sigue una arquitectura modular que separa el modelo de datos, el estado, la lógica pura de negocio, la construcción del DOM y la gestión de eventos:
