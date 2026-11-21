@@ -64,3 +64,40 @@ function crearLineaCarrito(linea, producto) {
     li.append(texto, botonEliminar);
     return li;
 }
+
+// Crear la tarjeta visual de un pedido con detalle desplegable
+function crearTarjetaPedido(pedido) {
+    const article = document.createElement("article");
+
+    // Cabecera con ID y fecha
+    const titulo = document.createElement("h3");
+    titulo.textContent = `Pedido #${pedido.id} — ${pedido.fecha}`;
+
+    // Datos del cliente y modalidad
+    const infoCliente = document.createElement("p");
+    const textoEntrega = pedido.cliente.entrega === "envio"
+        ? `Envío a domicilio (${pedido.cliente.direccion}, CP ${pedido.cliente.cp})`
+        : "Recogida en tienda";
+    infoCliente.textContent = `Cliente: ${pedido.cliente.nombre} (${pedido.cliente.email}) | Entrega: ${textoEntrega}`;
+
+    // Resumen económico del pedido
+    const infoImporte = document.createElement("p");
+    infoImporte.textContent = `Subtotal: ${pedido.subtotal.toFixed(2)} € | Descuento: ${pedido.descuento.toFixed(2)} € | Total: ${pedido.total.toFixed(2)} €`;
+
+    // Desplegable nativo HTML5 con las líneas compradas
+    const detalles = document.createElement("details");
+    const resumen = document.createElement("summary");
+    resumen.textContent = `Ver productos comprados (${pedido.lineas.length})`;
+
+    const listaLineas = document.createElement("ul");
+    pedido.lineas.forEach((linea) => {
+        const li = document.createElement("li");
+        li.textContent = `${linea.nombre} — ${linea.cantidad} ud. × ${linea.precioUnitario.toFixed(2)} € = ${linea.subtotal.toFixed(2)} €`;
+        listaLineas.append(li);
+    });
+
+    detalles.append(resumen, listaLineas);
+    article.append(titulo, infoCliente, infoImporte, detalles);
+
+    return article;
+}

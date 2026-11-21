@@ -353,6 +353,53 @@ formPedido.addEventListener("submit", (e) => {
     estadoPedido.textContent = `¡Pedido #${nuevoPedido.id} registrado correctamente!`;
 });
 
+// Referencias al DOM (Historial y Exportación JSON)
+const filtroHistorial = document.querySelector("#filtro-historial");
+const listaPedidos = document.querySelector("#lista-pedidos");
+const mensajePedidos = document.querySelector("#mensaje-pedidos");
+const totalPedidosHistorial = document.querySelector("#total-pedidos-historial");
+const importePedidosHistorial = document.querySelector("#importe-pedidos-historial");
+const btnExportar = document.querySelector("#btn-exportar");
+const salidaJson = document.querySelector("#salida-json");
+
+// Función para pintar el historial filtrado y su resumen
+function renderizarHistorial() {
+    const modalidadElegida = filtroHistorial.value;
+
+    // Filtrar pedidos según el selector
+    const filtrados = pedidos.filter((pedido) => {
+        if (modalidadElegida === "todos" || modalidadElegida === "") {
+            return true;
+        }
+        return pedido.cliente.entrega === modalidadElegida;
+    });
+
+    // Limpiar contenedor y pintar tarjetas
+    listaPedidos.replaceChildren();
+
+    if (filtrados.length === 0) {
+        mensajePedidos.textContent = "No hay pedidos para mostrar con este filtro.";
+    } else {
+        mensajePedidos.textContent = "";
+        filtrados.forEach((pedido) => {
+            listaPedidos.append(crearTarjetaPedido(pedido));
+        });
+    }
+
+    // Calcular y mostrar totales del filtro actual
+    const resumen = calcularResumenHistorial(filtrados);
+    totalPedidosHistorial.textContent = String(resumen.cantidad);
+    importePedidosHistorial.textContent = resumen.importeTotal.toFixed(2);
+}
+
+// Evento para filtrar el historial al cambiar el select
+filtroHistorial.addEventListener("change", renderizarHistorial);
+
+// Evento para exportar los pedidos a formato JSON
+btnExportar.addEventListener("click", () => {
+    salidaJson.value = JSON.stringify(pedidos, null, 2);
+});
+
 // Pintado inicial
 renderizarCatalogo();
 renderizarCarrito();

@@ -62,3 +62,19 @@ function validarDatosPedido(datos) {
 
     return errores;
 }
+
+// Función para calcular totales del historial (sin tocar el DOM)
+function calcularResumenHistorial(listaPedidos) {
+    const importeTotal = listaPedidos.reduce((acumulador, pedido) => {
+        const totalPedido = Number(pedido.total);
+        if (Number.isFinite(totalPedido)) {
+            return acumulador + totalPedido;
+        }
+        return acumulador;
+    }, 0);
+
+    return {
+        cantidad: listaPedidos.length,
+        importeTotal: importeTotal
+    };
+}
