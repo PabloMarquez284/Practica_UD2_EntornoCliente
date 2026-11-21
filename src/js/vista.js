@@ -44,3 +44,23 @@ function crearTarjetaProducto(producto) {
     
     return article;
 }
+
+// Función para mostrar un texto y un botón  de eliminar cada vez que se añade un producto al carrito
+function crearLineaCarrito(linea, producto) {
+    const li = document.createElement("li");
+    const subtotal = producto.precio * linea.cantidad;
+
+    // Texto de la línea
+    const texto = document.createElement("span");
+    texto.textContent = `${producto.nombre} - Cantidad: ${linea.cantidad} - Precio: ${producto.precio.toFixed(2)} € - Subtotal: ${subtotal.toFixed(2)} € `;
+    // Botón eliminar
+    const botonEliminar = document.createElement("button");
+    botonEliminar.type = "button";
+    botonEliminar.textContent = "Eliminar";
+    botonEliminar.dataset.accion = "eliminar";
+    botonEliminar.dataset.id = String(producto.id);
+
+    // Añadir los elementos dentro de li
+    li.append(texto, botonEliminar);
+    return li;
+}
