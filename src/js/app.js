@@ -226,7 +226,7 @@ function mostrarErrores(todos = false) {
 
     paresError.forEach(([campo, etiquetaError]) => {
         // Si es recogida, no mostramos errores de dirección ni código postal
-        if (esRecogida && (campo === campoDireccion || campo === campoCp)) {
+        if (esRecogida && (campo === campoDireccion || campo === campoCP)) {
             return;
         }
         // Si no se piden todos, solo mostramos los campos que el usuario ya tocó
@@ -355,12 +355,12 @@ formPedido.addEventListener("submit", (e) => {
 
 // Referencias al DOM (Historial y Exportación JSON)
 const filtroHistorial = document.querySelector("#filtro-historial");
-const listaPedidos = document.querySelector("#lista-pedidos");
-const mensajePedidos = document.querySelector("#mensaje-pedidos");
-const totalPedidosHistorial = document.querySelector("#total-pedidos-historial");
-const importePedidosHistorial = document.querySelector("#importe-pedidos-historial");
+const listaPedidos = document.querySelector("#lista-historial");
+const mensajePedidos = document.querySelector("#mensaje-historial");
+const totalPedidosHistorial = document.querySelector("#historial-cantidad");
+const importePedidosHistorial = document.querySelector("#historial-total");
 const btnExportar = document.querySelector("#btn-exportar");
-const salidaJson = document.querySelector("#salida-json");
+const salidaJson = document.querySelector("#json-historial");
 
 // Función para pintar el historial filtrado y su resumen
 function renderizarHistorial() {
